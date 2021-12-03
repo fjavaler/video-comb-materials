@@ -28,7 +28,7 @@ example(of: "Create a Blackjack card dealer") {
   
   // Add subscription to dealtHand here
   dealtHand
-    .sink { result in
+    .sink { error in
 //      Method 1: Iterate through all sink result cases:
 //      switch(result) {
 //      case .failure(let error):
@@ -38,7 +38,7 @@ example(of: "Create a Blackjack card dealer") {
 //      }
       
 //       Method 2: Handle any publisher failure and print error text:
-      if case .failure(let error) = result {
+      if case .failure(let error) = error {
         print(error)
       }
       

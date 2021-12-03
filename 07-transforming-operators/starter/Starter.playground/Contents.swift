@@ -3,7 +3,48 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "Collect") {
+  // Turn Array into publisher and subscribe to it.
+  ["A","B","C","D","E"].publisher
+  //   Collects every element in the array and combines them into one output array.
+  //   Similar to how flatMap does this.
+    .collect()
+  //   Collect two elements at a time and puts them into an array.
+  //    .collect(2)
+    .sink {
+      // If subscription receives a completion...
+      print($0)
+    } receiveValue: {
+      // If subscription receives a value...
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "Transformer (map)") {
+  let formatter = NumberFormatter()
+  formatter.numberStyle = .spellOut
+  
+  [123, 4, 56].publisher
+    .map {
+      formatter.string(for: NSNumber(integerLiteral: $0)) ?? ""
+    }
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "Transformer (replaceNil)") {
+  ["A", nil, "C"].publisher
+    .replaceNil(with: "-")
+    .sink {
+      print($0 as String)
+    }
+    .store(in: &subscriptions)
+}
+
+
 
 /// Copyright (c) 2020 Razeware LLC
 ///

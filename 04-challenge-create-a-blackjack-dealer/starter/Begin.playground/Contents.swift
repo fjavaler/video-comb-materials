@@ -6,7 +6,7 @@ var subscriptions = Set<AnyCancellable>()
 example(of: "Create a Blackjack card dealer") {
   let dealtHand = PassthroughSubject<Hand, HandError>()
   
-  func deal(_ cardCount: UInt) {
+  func deal(cards cardCount: UInt) {
     var deck = cards
     var cardsRemaining = 52
     var hand = Hand()
@@ -19,13 +19,35 @@ example(of: "Create a Blackjack card dealer") {
     }
     
     // Add code to update dealtHand here
-    
+    if hand.points > 21 {
+      dealtHand.send(completion: .failure(.busted))
+    } else {
+      dealtHand.send(hand)
+    }
   }
   
   // Add subscription to dealtHand here
+  dealtHand
+    .sink { result in
+//      Method 1: Iterate through all sink result cases:
+//      switch(result) {
+//      case .failure(let error):
+//        print(error)
+//      case .finished:
+//        print("Finished")
+//      }
+      
+//       Method 2: Handle any publisher failure and print error text:
+      if case .failure(let error) = result {
+        print(error)
+      }
+      
+    } receiveValue: { hand in
+      print(hand.cardString, "for", hand.points, "points.")
+    }
+    .store(in: &subscriptions)
   
-  
-  deal(3)
+  deal(cards: 3)
 }
 
 /// Copyright (c) 2019 Razeware LLC

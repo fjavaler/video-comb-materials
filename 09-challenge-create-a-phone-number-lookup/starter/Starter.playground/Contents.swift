@@ -10,10 +10,10 @@ example(of: "Create a phone number lookup") {
     "217-555-1212": "Scott",
     "212-555-3434": "Shai"
   ]
-
+  
   func convert(phoneNumber: String) -> Int? {
     if let number = Int(phoneNumber),
-      number < 10 {
+       number < 10 {
       return number
     }
     
@@ -22,29 +22,29 @@ example(of: "Create a phone number lookup") {
       "jkl": 5, "mno": 6, "pqrs": 7,
       "tuv": 8, "wxyz": 9
     ]
-
+    
     let converted = keyMap
       .filter { $0.key.contains(phoneNumber.lowercased()) }
       .map { $0.value }
       .first
-
+    
     return converted
   }
-
+  
   func format(digits: [Int]) -> String {
     var phone = digits.map(String.init)
-                      .joined()
-
+      .joined()
+    
     phone.insert("-", at: phone.index(
       phone.startIndex,
       offsetBy: 3)
     )
-
+    
     phone.insert("-", at: phone.index(
       phone.startIndex,
       offsetBy: 7)
     )
-
+    
     return phone
   }
   
@@ -52,22 +52,25 @@ example(of: "Create a phone number lookup") {
     guard let contact = contacts[phoneNumber] else {
       return "Contact not found for \(phoneNumber)"
     }
-
+    
     return "Dialing \(contact) (\(phoneNumber))..."
   }
   
   let input = PassthroughSubject<String, Never>()
-
+  
   input
     .map({ numberToConvert in
+      // Executes convert method on the string.
       convert(phoneNumber: numberToConvert)
     })
     .replaceNil(with: 0)
     .collect(10)
     .map({ array in
+      // Executes format method on the collected array.
       format(digits: array)
     })
     .map({ numberToDial in
+      // Executes dial method on the formatted strings as they are sent.
       dial(phoneNumber: numberToDial)
     })
     .sink {

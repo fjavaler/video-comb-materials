@@ -16,7 +16,7 @@ example(of: "Create a phone number lookup") {
       number < 10 {
       return number
     }
-
+    
     let keyMap: [String: Int] = [
       "abc": 2, "def": 3, "ghi": 4,
       "jkl": 5, "mno": 6, "pqrs": 7,
@@ -55,10 +55,36 @@ example(of: "Create a phone number lookup") {
 
     return "Dialing \(contact) (\(phoneNumber))..."
   }
-
-
-
   
+  let input = PassthroughSubject<String, Never>()
+
+  input
+    .map({ numberToConvert in
+      convert(phoneNumber: numberToConvert)
+    })
+    .replaceNil(with: 0)
+    .collect(10)
+    .map({ array in
+      format(digits: array)
+    })
+    .map({ numberToDial in
+      dial(phoneNumber: numberToDial)
+    })
+    .sink {
+      print($0)
+    }
+  
+  "🍎0!1234567".forEach {
+    input.send(String($0))
+  }
+  
+  "4085554321".forEach {
+    input.send(String($0))
+  }
+  
+  "A1BJKLDGEH".forEach {
+    input.send("\($0)")
+  }
 }
 
 /// Copyright (c) 2020 Razeware LLC

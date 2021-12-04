@@ -27,7 +27,8 @@ example(of: "Transformer (map)") {
   
   [123, 4, 56].publisher
     .map {
-      formatter.string(for: NSNumber(integerLiteral: $0)) ?? ""
+      // "return" optional.
+      return formatter.string(for: NSNumber(integerLiteral: $0)) ?? ""
     }
     .sink {
       print($0)
@@ -38,13 +39,59 @@ example(of: "Transformer (map)") {
 example(of: "Transformer (replaceNil)") {
   ["A", nil, "C"].publisher
     .replaceNil(with: "-")
+    .map({ string in
+      // "return" optional.
+      return string!
+    })
     .sink {
-      print($0 as String)
+      print($0)
     }
     .store(in: &subscriptions)
 }
 
+example(of: "Transformer [replaceEmpty(with:)]") {
+  let empty = Empty<Int, Never>()
+  
+  empty
+    .replaceEmpty(with: 1)
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
 
+example(of: "Transformer (scan)") {
+  var dailyGainLoss: Int {
+    Int.random(in: -10...10)
+  }
+  
+  let august2019 = (0..<31)
+    .map { _ in
+      return dailyGainLoss
+    }
+    .publisher
+  
+  august2019
+    .scan(50) { latest, current in
+      max(0, latest + current)
+    }
+    .print()
+    .sink { _ in
+      // Do nothing.
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "Transformer (easier to comprehend example of scan)") {
+  [1,2,3,4,5,6].publisher
+    .scan(1, { num1, num2 in
+      num1 + (num1 + num2)
+    })
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
 
 /// Copyright (c) 2020 Razeware LLC
 ///

@@ -21,7 +21,7 @@ example(of: "Collect") {
     .store(in: &subscriptions)
 }
 
-example(of: "Transformer (map)") {
+example(of: "Transforming operator (map)") {
   let formatter = NumberFormatter()
   formatter.numberStyle = .spellOut
   
@@ -36,7 +36,7 @@ example(of: "Transformer (map)") {
     .store(in: &subscriptions)
 }
 
-example(of: "Transformer (replaceNil)") {
+example(of: "Transforming operator (replaceNil)") {
   ["A", nil, "C"].publisher
     .replaceNil(with: "-")
     .map({ string in
@@ -49,7 +49,7 @@ example(of: "Transformer (replaceNil)") {
     .store(in: &subscriptions)
 }
 
-example(of: "Transformer [replaceEmpty(with:)]") {
+example(of: "Transforming operator [replaceEmpty(with:)]") {
   let empty = Empty<Int, Never>()
   
   empty
@@ -60,7 +60,7 @@ example(of: "Transformer [replaceEmpty(with:)]") {
     .store(in: &subscriptions)
 }
 
-example(of: "Transformer (scan)") {
+example(of: "Transforming operator (scan)") {
   var dailyGainLoss: Int {
     Int.random(in: -10...10)
   }
@@ -82,7 +82,7 @@ example(of: "Transformer (scan)") {
     .store(in: &subscriptions)
 }
 
-example(of: "Transformer (easier to comprehend example of scan)") {
+example(of: "Transforming operator (easier to comprehend example of scan)") {
   [1,2,3,4,5,6].publisher
     .scan(1, { num1, num2 in
       num1 + (num1 + num2)
@@ -91,6 +91,39 @@ example(of: "Transformer (easier to comprehend example of scan)") {
       print($0)
     }
     .store(in: &subscriptions)
+}
+
+example(of: "Transforming operator (flatMap)") {
+  let charlotte = Chatter(name: "Charlotte", message: "Charlotte: Hi, I'm Charlotte!")
+  let james = Chatter(name: "James", message: "James: Hi, I'm James!")
+  
+  // Publisher. Sets chat.value to charlotte
+  let chat = CurrentValueSubject<Chatter, Never>(charlotte)
+  
+  // Subscribes to value to map and prints.
+  chat
+    .flatMap({
+      $0.message
+    })
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+  
+  // Updates charlotte.message.value. .message is the value that we are subscribed to.
+  // Therefore, prints value per sink block above.
+  charlotte.message.value = "Charlotte: How's it going?"
+  
+  // Add's Chatter, james, to chat's value. Flatmap, sink, and store block now applies
+  // to chat.value of James as well.
+  chat.value = james
+  
+  // Updates james.message.value and prints per sink block.
+  james.message.value = "James: Doing great. You?"
+  // Updates charlotte.message.value and prints per sink block.
+  // Notice both james.message.value and charlotte.message.value are both subscribed to
+  // simulataneously now.
+  charlotte.message.value = "Charlotte: I'm doing fine, thanks."
 }
 
 /// Copyright (c) 2020 Razeware LLC

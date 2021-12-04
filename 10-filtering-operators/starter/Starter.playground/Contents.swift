@@ -3,7 +3,57 @@ import Combine
 
 var subscriptions = Set<AnyCancellable>()
 
-<#Add your code here#>
+example(of: "filter") {
+  let numbers = (1...10).publisher
+  
+  numbers
+    .filter {
+      $0.isMultiple(of: 3)
+    }
+    .sink { n in
+      print("\(n) is a multiple of 3!")
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "removeDuplicates") {
+  let words = "1,1,1,2,3,3,3,3,3,4,4,4,4,4,4,4,4,1"
+    .components(separatedBy: ",")
+    .publisher
+   
+  words
+    .removeDuplicates()
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "compactMap") {
+  let strings = ["a", "1.24", "3", "def", "45", ".23"].publisher
+  
+  strings
+    .compactMap {
+      Float($0)
+    }
+    .sink {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
+
+example(of: "ignoreOutput") {
+  let numbers = (1...10_000).publisher
+  
+  numbers
+    .ignoreOutput()
+    .sink {
+      print("Completed with \($0)")
+    } receiveValue: {
+      print($0)
+    }
+    .store(in: &subscriptions)
+}
 
 /// Copyright (c) 2020 Razeware LLC
 ///

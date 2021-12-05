@@ -9,11 +9,13 @@ example(of: "Making Phone Numbers Part 2") {
   let areaCodePublisher = ["410", "757", "800", "540"].publisher
   let phoneExtensionPublisher = ["EXT 901", "EXT 523", "EXT 137", "EXT 100"].publisher
   
-  <#Add your code here#>
-  
-  
-  
-  
+  areaCodePublisher
+    .zip(phoneNumbersPublisher)
+    .map {$0 + "-" + $1}
+    .zip(phoneExtensionPublisher)
+    .map {$0 + " " + $1}
+    .sink(receiveValue : { print($0) })
+    .store(in: &subscriptions)
 }
 
 /// Copyright (c) 2020 Razeware LLC

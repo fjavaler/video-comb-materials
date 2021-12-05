@@ -10,9 +10,14 @@ example(of: "Making Phone Numbers") {
   let phoneExtension = "901"
 
   
-  <#Add your code here#>
-  
+  phoneNumbersPublisher
+    .prepend("1-", areaCode, "-")
+    .append(" EXT ", phoneExtension)
+    .collect()
+    .sink(receiveValue: { print($0.joined()) })
+    .store(in: &subscriptions)
 }
+
 /// Copyright (c) 2020 Razeware LLC
 ///
 /// Permission is hereby granted, free of charge, to any person obtaining a copy

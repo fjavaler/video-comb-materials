@@ -4,6 +4,32 @@ import PlaygroundSupport
 
 
 //: [Next](@next)
+
+enum TimeoutError: Error {
+  case timedOut
+}
+
+let subject = PassthroughSubject<Void, TimeoutError>()
+
+let timedOutSubject = subject
+  .timeout(.seconds(5), scheduler: DispatchQueue.main, customError: {.timedOut})
+
+let timeline = TimelineView(title: "Button taps")
+
+let view = VStack(spacing: 100) {
+  Button {
+    // Action
+    subject.send()
+  } label: {
+    Text("Press me within 5 seconds")
+  }
+  timeline
+}.frame(width: 300, height: 300)
+
+PlaygroundPage.current.liveView = UIHostingController(rootView: view)
+
+timedOutSubject.displayEvents(in: timeline)
+
 /*:
  Copyright (c) 2020 Razeware LLC
  
